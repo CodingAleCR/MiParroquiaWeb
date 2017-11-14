@@ -4,8 +4,17 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var admin = require("firebase-admin");
+var serviceAccount = require("./serviceAccountKey.json");
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: "https://mi-parroquia-crc.firebaseio.com"
+});
+
 
 var index = require('./routes/index');
+var login = require('./routes/login');
 var users = require('./routes/users');
 
 var app = express();
