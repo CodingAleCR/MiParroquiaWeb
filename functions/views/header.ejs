@@ -21,6 +21,12 @@
         </li>
         <% } %>
     </ul>
-    <a class="btn btn-info" href="/login">Login</a>
+    <% if (user) { %>
+      <a class="btn btn-info" href="#"><%= user.email %></a>
+    <% } else { %>
+      <a class="btn btn-info" href="/login">Login</a>
+    <% } %>
   </div>
 </nav>
+
+  

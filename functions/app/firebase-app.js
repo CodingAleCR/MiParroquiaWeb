@@ -1,6 +1,6 @@
 const functions = require('firebase-functions');
-const admin = require('firebase-admin');
+const firebase = require('firebase');
 
-const firebaseApp = admin.initializeApp(functions.config().firebase);
+const firebaseApp = firebase.initializeApp(functions.config().firebase);
 
 module.exports = firebaseApp
