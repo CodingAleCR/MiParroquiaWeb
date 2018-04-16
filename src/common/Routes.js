@@ -1,0 +1,5 @@
+export const HOME_PAGE = "/"
+export const ABOUT_PAGE = "/about"
+export const SIGN_IN_PAGE = "/signin"
+export const SIGN_UP_PAGE = "/signup"
+export const ADMIN_PAGE = "/admin"
