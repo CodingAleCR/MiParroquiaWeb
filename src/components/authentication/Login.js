@@ -1,16 +1,15 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { withRouter } from 'react-router-dom';
 import { withStyles } from 'material-ui/styles';
 import Typography from 'material-ui/Typography';
 import Grid from 'material-ui/Grid';
 import TextField from 'material-ui/TextField';
 import Button from 'material-ui/Button';
 import Card, { CardActions, CardContent } from 'material-ui/Card';
-import { Redirect } from 'react-router-dom';
-import { ADMIN_PAGE } from '../../routes/Routes';
+import { ADMIN_PAGE } from '../../constants/routes';
 import Navigation from '../../common/Navigation';
-import base from '../../base'
-import fireapp from '../../fireapp'
+import { auth } from '../../firebase';
 
 const styles = theme => ({
     root: {
@@ -40,7 +39,7 @@ class Login extends Component {
     state = {
         username: null,
         password: null,
-        logged: false,
+        error: null
     };
 
     handleChange = name => event => {
@@ -53,13 +52,18 @@ class Login extends Component {
         event.preventDefault();
         const email = this.state.username
         const password = this.state.password
-        fireapp.auth().signInWithEmailAndPassword(email, password).then(user => {
-            if (user) {
-                this.props.setUser(user)
-            } else {
-                this.resetLoginForm()
-            }
-        });
+        auth.doSignInWithEmailAndPassword(email, password)
+            .then(user => {
+                if (user) {
+                    this.props.history.push(ADMIN_PAGE);
+                } else {
+                    this.resetLoginForm()
+                }
+            }).catch(error => {
+                this.setState({
+                    'error': error,
+                });
+            });;
     }
 
     resetLoginForm() {
@@ -69,19 +73,23 @@ class Login extends Component {
     }
 
     renderLoginForm = () => {
+        const { classes } = this.props
+
+        const isInvalid = this.password === ''
+            || this.username === '';
+
         return (
             <Grid xs={4} item style={styles.paper}>
                 <Card>
-                    <form onSubmit={(e) => this.loginToApp(e)}>
+                    <form onSubmit={this.loginToApp}>
                         <CardContent>
                             <Typography gutterBottom variant="headline" component="h2">Ingresar a MiParroquia</Typography>
-
                             <TextField
                                 id="username"
                                 label="Username"
                                 value={this.username}
                                 onChange={this.handleChange('username')}
-                                className={this.props.classes.textField}
+                                className={classes.textField}
                                 margin="normal"
                                 type="email"
                                 fullWidth
@@ -89,15 +97,17 @@ class Login extends Component {
                             <TextField
                                 id="password"
                                 label="Password"
+                                value={this.password}
                                 onChange={this.handleChange('password')}
-                                className={this.props.classes.textField}
+                                className={classes.textField}
                                 margin="normal"
                                 type="password"
                                 fullWidth
                             />
+                            {this.error && <p>{this.error.message}</p>}
                         </CardContent>
                         <CardActions>
-                            <Button size="small" color="secondary" type='submit'>Ingresar</Button>
+                            <Button size="small" color="secondary" type='submit' disabled={isInvalid}>Ingresar</Button>
                         </CardActions>
                     </form>
                 </Card>
@@ -106,10 +116,6 @@ class Login extends Component {
     }
 
     render() {
-        if (this.props.user) {
-            return <Redirect to={ADMIN_PAGE} />
-        }
-
         return (
             <div className={this.props.classes.root} >
                 <Navigation type='admin' />
@@ -134,4 +140,4 @@ class Login extends Component {
     };
 }
 
-export default withStyles(styles)(Login);
+export default withRouter(withStyles(styles)(Login));
